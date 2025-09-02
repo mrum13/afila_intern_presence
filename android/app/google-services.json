@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "605375014836",
+    "project_id": "afila-intern-presence",
+    "storage_bucket": "afila-intern-presence.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605375014836:android:8fca5d1bc3c26b521e74e1",
+        "android_client_info": {
+          "package_name": "com.example.afila_intern_presence"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPoHrKInXHzCKePJlb1s9Q5qATsl2vQoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
