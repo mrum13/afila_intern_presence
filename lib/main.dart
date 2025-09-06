@@ -2,14 +2,18 @@ import 'package:afila_intern_presence/admin/cubit/create_employee_cubit.dart';
 import 'package:afila_intern_presence/admin/cubit/create_user_cubit.dart';
 import 'package:afila_intern_presence/admin/cubit/get_intern_data_cubit.dart';
 import 'package:afila_intern_presence/admin/pages/create_user_page.dart';
-import 'package:afila_intern_presence/admin/pages/main_page.dart' as adminmainpage;
+import 'package:afila_intern_presence/admin/pages/main_page.dart'
+    as adminmainpage;
 import 'package:afila_intern_presence/cubit/navbar_cubit.dart';
 import 'package:afila_intern_presence/intern/cubit/get_current_user_cubit.dart';
 import 'package:afila_intern_presence/intern/cubit/get_list_presence_cubit.dart';
+import 'package:afila_intern_presence/intern/cubit/presence_cubit.dart';
 import 'package:afila_intern_presence/intern/pages/live_preview_page.dart';
-import 'package:afila_intern_presence/intern/pages/main_page.dart' as internmainpage;
+import 'package:afila_intern_presence/intern/pages/main_page.dart'
+    as internmainpage;
 import 'package:afila_intern_presence/intern/pages/result_page.dart';
-import 'package:afila_intern_presence/lecture/pages/main_page.dart' as lecturemainpage;
+import 'package:afila_intern_presence/lecture/pages/main_page.dart'
+    as lecturemainpage;
 import 'package:afila_intern_presence/cubit/auth_cubit.dart';
 import 'package:afila_intern_presence/firebase_options.dart';
 import 'package:afila_intern_presence/pages/login_page.dart';
@@ -45,19 +49,28 @@ class MainApp extends StatelessWidget {
           create: (context) => NavbarCubit(),
         ),
         BlocProvider(
-          create: (context) => CreateUserCubit(FirebaseAuthService(firebaseAuth)),
+          create: (context) =>
+              CreateUserCubit(FirebaseAuthService(firebaseAuth)),
         ),
         BlocProvider(
-          create: (context) => GetInternDataCubit(FirebaseFirestoreService(firebaseFirestore)),
+          create: (context) =>
+              GetInternDataCubit(FirebaseFirestoreService(firebaseFirestore)),
         ),
         BlocProvider(
-          create: (context) => GetCurrentUserCubit(FirebaseFirestoreService(firebaseFirestore)),
+          create: (context) =>
+              GetCurrentUserCubit(FirebaseFirestoreService(firebaseFirestore)),
         ),
         BlocProvider(
-          create: (context) => CreateEmployeeCubit(FirebaseFirestoreService(firebaseFirestore)),
+          create: (context) =>
+              CreateEmployeeCubit(FirebaseFirestoreService(firebaseFirestore)),
         ),
         BlocProvider(
-          create: (context) => GetListPresenceCubit(FirebaseFirestoreService(firebaseFirestore)),
+          create: (context) =>
+              GetListPresenceCubit(FirebaseFirestoreService(firebaseFirestore)),
+        ),
+        BlocProvider(
+          create: (context) =>
+              PresenceCubit(FirebaseFirestoreService(firebaseFirestore)),
         ),
       ],
       child: MaterialApp(

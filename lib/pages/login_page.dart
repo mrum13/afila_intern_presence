@@ -1,9 +1,9 @@
 import 'package:afila_intern_presence/admin/cubit/get_intern_data_cubit.dart';
-import 'package:afila_intern_presence/common/app_colors.dart';
 import 'package:afila_intern_presence/common/message_widget.dart';
 import 'package:afila_intern_presence/cubit/auth_cubit.dart';
 import 'package:afila_intern_presence/cubit/navbar_cubit.dart';
 import 'package:afila_intern_presence/intern/cubit/get_current_user_cubit.dart';
+import 'package:afila_intern_presence/intern/cubit/get_list_presence_cubit.dart';
 import 'package:afila_intern_presence/widgets/circular_progress_custom.dart';
 import 'package:afila_intern_presence/widgets/elevated_button_custom.dart';
 import 'package:afila_intern_presence/widgets/text_form_field_custom.dart';
@@ -74,6 +74,7 @@ class LoginPage extends StatelessWidget {
                       Navigator.pushNamed(context, '/main-page-admin');
                     } else if (role.contains("@intern")) {
                       context.read<GetCurrentUserCubit>().getData(docId: role);
+                      context.read<GetListPresenceCubit>().getData();
                       Navigator.pushNamed(context, '/main-page-intern');
                     } else {}
                   }

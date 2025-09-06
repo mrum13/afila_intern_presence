@@ -5,14 +5,16 @@ class PresenceModel extends Equatable {
   final String status;
   final DateTime checkIn;
   final DateTime checkOut;
+  final String statement;
 
-  const PresenceModel({required this.status, required this.checkIn, required this.checkOut});
+  const PresenceModel({required this.status, required this.checkIn, required this.checkOut, required this.statement});
 
   factory PresenceModel.fromJson(Map<String, dynamic> map) {
     return PresenceModel(
       status: map['status'] as String,
       checkIn: (map['check_in'] as Timestamp).toDate(),
       checkOut: (map['check_out'] as Timestamp).toDate(),
+      statement: map['statement'] as String,
     );
   }
   
@@ -20,7 +22,8 @@ class PresenceModel extends Equatable {
   List<Object?> get props => [
     status,
     checkIn, 
-    checkOut
+    checkOut,
+    statement
   ];
 
 

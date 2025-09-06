@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:afila_intern_presence/admin/models/user_model.dart';
 import 'package:afila_intern_presence/intern/models/presence_model.dart';
 import 'package:afila_intern_presence/intern/models/user_model.dart';
-import 'package:afila_intern_presence/storage_service.dart';
+import 'package:afila_intern_presence/common/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:d_method/d_method.dart';
+import 'package:intl/intl.dart';
 
 class FirebaseFirestoreService {
   final FirebaseFirestore _firebaseFirestore;
@@ -30,21 +31,6 @@ class FirebaseFirestoreService {
       throw Exception(e.toString());
     }
   }
-
-  // Stream<List<Profile>> getData() { ///penggunaan snapshot untuk get data secara realtime
-  //   return _firebaseFirestore
-  //       .collection('pegawai')
-  //       .orderBy('dateCreated', descending: true)
-  //       .snapshots()
-  //       .map(
-  //         (event) => event.docs.map(
-  //           (e) {
-  //             final data = Profile.fromJson(e.data());
-  //             return data;
-  //           },
-  //         ).toList(),
-  //       );
-  // }
 
   Future<List<UserModel>> getDataEmployee() async {
     ///penggunaan get untuk get data tidak realtime
@@ -81,16 +67,68 @@ class FirebaseFirestoreService {
     try {
       final result = await _firebaseFirestore.collection('presence').get();
 
-      String? docId = await StorageService.getDocId(); 
+      String? docId = await StorageService.getDocId();
 
       var finalResult = result.docs
-          .where((event) => event.id.contains(docId)) // filter berdasarkan docId
+          .where(
+              (event) => event.id.contains(docId)) // filter berdasarkan docId
           .map((event) => PresenceModel.fromJson(event.data()))
           .toList();
 
       return finalResult;
     } catch (e) {
       throw Exception("Error ambil data: $e");
+    }
+  }
+
+  Future<bool> presence(
+      {required String presenceStatement,
+      required String status,
+      required String checkInTime,
+      required String checkOutTime}) async {
+    try {
+      String? docIdSaved = await StorageService.getDocId();
+
+      // 1. Ubah String ke DateTime
+      DateTime dateTimeCheckIn = DateTime.parse(checkInTime);
+      DateTime dateTimeCheckOut = DateTime.parse(checkOutTime);
+
+      // 2. Ubah DateTime ke Timestamp
+      Timestamp timestampCheckIn = Timestamp.fromDate(dateTimeCheckIn);
+      Timestamp timestampCheckOut = Timestamp.fromDate(dateTimeCheckOut);
+
+      String docId =
+          "${DateFormat('yyyy-MM-dd').format(DateTime.now())}|$docIdSaved";
+
+      var docData =
+          await _firebaseFirestore.collection('presence').doc(docId).get();
+
+      if (docData.exists) {
+        if (presenceStatement == "checkin") {
+          await _firebaseFirestore.collection('presence').doc(docId).set({
+            'status': status,
+            'check_in': timestampCheckIn,
+            'check_out': timestampCheckOut,
+            'statement': 'checkin'
+          });
+        } else if (presenceStatement == "checkout") {
+          await _firebaseFirestore.collection('presence').doc(docId).update({
+            'check_out': timestampCheckOut,
+            'statement': 'checkout'
+          });
+        }
+      } else {
+        await _firebaseFirestore.collection('presence').doc(docId).set({
+          'status': status,
+          'check_in': timestampCheckIn,
+          'check_out': timestampCheckOut,
+          'statement': 'checkin'
+        });
+      }
+
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 }

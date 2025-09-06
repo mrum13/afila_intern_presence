@@ -1,4 +1,5 @@
 import 'package:afila_intern_presence/intern/pages/result_page.dart';
+import 'package:afila_intern_presence/widgets/elevated_button_custom.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:d_method/d_method.dart';
@@ -222,24 +223,44 @@ class _LivePreviewPageState extends State<LivePreviewPage> {
             _cameraController == null || !_cameraController!.value.isInitialized
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.rotationY(
-                                _cameraController!.description.lensDirection ==
-                                        CameraLensDirection.front
-                                    ? 3.1416
-                                    : 0),
-                            child: CameraPreview(_cameraController!)),
-                        const SizedBox(height: 24),
-                        Text(
-                          "Urutan step: ${_randomSteps.join(" → ")}",
-                          style: const TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        children: [
+                          Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.rotationY(
+                                  _cameraController!.description.lensDirection ==
+                                          CameraLensDirection.front
+                                      ? 3.1416
+                                      : 0),
+                              child: CameraPreview(_cameraController!)),
+                          const SizedBox(height: 24),
+                          Text(
+                            "Urutan step: ${_randomSteps.join(" → ")}",
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          ElevatedButtonCustom(
+                              onTap: () async {
+                                final XFile file = await _cameraController!.takePicture();
+                      
+                                if (!context.mounted) return;
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ResultPage(imageFile: File(file.path)),
+                                  ),
+                                );
+                              },
+                              text: "Bypass"),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
                   ));
   }

@@ -1,5 +1,7 @@
 import 'package:afila_intern_presence/common/app_colors.dart';
 import 'package:afila_intern_presence/intern/cubit/get_current_user_cubit.dart';
+import 'package:afila_intern_presence/intern/cubit/get_list_presence_cubit.dart';
+import 'package:afila_intern_presence/intern/cubit/presence_cubit.dart';
 import 'package:d_method/d_method.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +17,8 @@ class HomePage extends StatefulWidget {
 
 class _MainPageState extends State<HomePage> {
   String userName = "-";
+  String checkInTime = "-";
+  String checkOutTime = "-";
 
   @override
   void initState() {
@@ -82,87 +86,127 @@ class _MainPageState extends State<HomePage> {
             const SizedBox(
               height: 24,
             ),
-            Text("Absen hari ini",style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
-            const SizedBox(height: 8,),
-            Card(
-              color: blueColor,
-              shadowColor: yellowColor,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Absen Datang",
-                      style: TextStyle(
-                          color: whiteColor, fontWeight: FontWeight.w500),
-                    ),
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "09:00:00",
-                          style: TextStyle(color: whiteColor),
-                        ),
-                        Text(
-                          "|",
-                          style: TextStyle(color: yellowColor),
-                        ),
-                        Text(
-                          "00:00:00",
-                          style: TextStyle(color: yellowColor),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
+            Text(
+              "Absen hari ini",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(
               height: 8,
             ),
-            Card(
-              color: blueColor,
-              shadowColor: yellowColor,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Absen Pulang",
-                      style: TextStyle(
-                          color: whiteColor, fontWeight: FontWeight.w500),
-                    ),
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            BlocBuilder<GetListPresenceCubit, GetListPresenceState>(
+              builder: (context, state) {
+                if (state is GetListPresenceSuccess) {
+                  checkInTime = DateFormat("HH:mm:ss").format(state.data
+                      .map(
+                        (e) => e.checkIn,
+                      )
+                      .first);
+                } else {
+                  checkInTime = "--:--:--";
+                }
+                return Card(
+                  color: blueColor,
+                  shadowColor: yellowColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "17:00:00",
-                          style: TextStyle(color: whiteColor),
+                          "Absen Datang",
+                          style: TextStyle(
+                              color: whiteColor, fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "|",
-                          style: TextStyle(color: yellowColor),
-                        ),
-                        Text(
-                          "00:00:00",
-                          style: TextStyle(color: yellowColor),
-                        ),
+                        const Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "09:00:00",
+                              style: TextStyle(color: whiteColor),
+                            ),
+                            Text(
+                              "|",
+                              style: TextStyle(color: yellowColor),
+                            ),
+                            Text(
+                              checkInTime,
+                              style: TextStyle(color: yellowColor),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+                );
+              },
             ),
-            const SizedBox(height: 24,),
-            Text("Lokasi absen",style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
+            BlocBuilder<GetListPresenceCubit, GetListPresenceState>(
+              builder: (context, state) {
+                if (state is GetListPresenceSuccess) {
+                  var data = state.data.map((e) => e.checkOut,).first;
+                  if (data!="-"){
+                    checkOutTime = DateFormat("HH:mm:ss").format(data);
+                  } else {
+                    checkOutTime = "--:--:--";
+                  }
+                } else {
+                  checkOutTime = "--:--:--";
+                }
+                return Card(
+                  color: blueColor,
+                  shadowColor: yellowColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Absen Pulang",
+                          style: TextStyle(
+                              color: whiteColor, fontWeight: FontWeight.w500),
+                        ),
+                        const Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "17:00:00",
+                              style: TextStyle(color: whiteColor),
+                            ),
+                            Text(
+                              "|",
+                              style: TextStyle(color: yellowColor),
+                            ),
+                            Text(
+                              checkOutTime,
+                              style: TextStyle(color: yellowColor),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            Text(
+              "Lokasi absen",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
             ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: Image.asset("assets/img_location.png",
+              child: Image.asset(
+                "assets/img_location.png",
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,

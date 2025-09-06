@@ -1,0 +1,1 @@
+List<String> options = ['Hadir','Izin','Sakit'];

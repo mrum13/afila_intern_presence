@@ -1,4 +1,4 @@
-import 'package:afila_intern_presence/storage_service.dart';
+import 'package:afila_intern_presence/common/storage_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseAuthService {

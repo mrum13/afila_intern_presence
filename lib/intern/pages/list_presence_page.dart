@@ -41,7 +41,7 @@ class _ListPresencePageState extends State<ListPresencePage> {
               );
             } else if (state is GetListPresenceSuccess) {
               return ListView.separated(
-                itemBuilder: (context, index) => Card(
+                itemBuilder: (context, index) => state.data.isEmpty? Text("Data kosong") : Card(
                       shadowColor: blueColor,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -92,7 +92,7 @@ class _ListPresencePageState extends State<ListPresencePage> {
                                             width: 4,
                                           ),
                                           Text(
-                                            DateFormat('hh:mm:ss').format(state.data[index].checkIn),
+                                            DateFormat('HH:mm:ss').format(state.data[index].checkIn),
                                             style: TextStyle(color: blueColor),
                                           ),
                                         ],
@@ -112,7 +112,9 @@ class _ListPresencePageState extends State<ListPresencePage> {
                                             width: 4,
                                           ),
                                           Text(
-                                            DateFormat('hh:mm:ss').format(state.data[index].checkOut),
+                                            state.data[index].statement=="checkout"
+                                            ? DateFormat('HH:mm:ss').format(state.data[index].checkOut)
+                                            : "-",
                                             style: TextStyle(color: blueColor),
                                           ),
                                         ],
