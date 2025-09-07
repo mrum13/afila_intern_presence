@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:afila_intern_presence/common/app_colors.dart';
 import 'package:afila_intern_presence/common/message_widget.dart';
 import 'package:afila_intern_presence/common/option_presence.dart';
+import 'package:afila_intern_presence/common/security_checker.dart';
 import 'package:afila_intern_presence/intern/cubit/get_list_presence_cubit.dart';
 import 'package:afila_intern_presence/intern/cubit/presence_cubit.dart';
 import 'package:afila_intern_presence/intern/pages/main_page.dart';
@@ -12,6 +13,7 @@ import 'package:afila_intern_presence/mlkit_services/helper/convert_face.dart';
 import 'package:afila_intern_presence/common/storage_service.dart';
 import 'package:afila_intern_presence/widgets/circular_progress_custom.dart';
 import 'package:afila_intern_presence/widgets/elevated_button_custom.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,14 +36,10 @@ class _ResultPageState extends State<ResultPage> {
 
   Future<void> _verifyFace(File pickedFile) async {
     var savedEmbedding = await StorageService.getFaces();
-    if (savedEmbedding == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Belum ada wajah yang terdaftar")));
-      return;
-    }
 
     final face = await faceDetector.detectAndCropFace(File(pickedFile.path));
     if (face == null) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Tidak ada wajah terdeteksi")));
       return;
@@ -59,21 +57,18 @@ class _ResultPageState extends State<ResultPage> {
     final similarity =
         faceRecognition.cosineSimilarity(savedEmbedding, embedding);
 
-    String result = "-";
-
     if (similarity > 0.8) {
       setState(() {
         isSimillar = true;
       });
-      result = "Wajah cocok ✅ ($similarity)";
     } else {
       setState(() {
         isSimillar = false;
       });
-      result = "Wajah tidak cocok ❌ ($similarity)";
     }
 
     if (similarity < 0.8) {
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) {
@@ -99,13 +94,14 @@ class _ResultPageState extends State<ResultPage> {
             ),
           );
         },
-      ).then(
-        (value) => Navigator.pushReplacement(
+      ).then((value) {
+        if (!mounted) return;
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => MainPage(),
-            )),
-      );
+            ));
+      });
     }
 
     setState(() {
@@ -115,18 +111,39 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     faceRecognition.loadModel().then((value) => _verifyFace(widget.imageFile));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Waktu sekarang
     DateTime now = DateTime.now();
-
-    // Buat jam 10:00 hari ini
     DateTime tenAM = DateTime(now.year, now.month, now.day, 10, 0);
+
+    Future<dartz.Either<bool, String>> deviceCheck() async {
+      if (Platform.isAndroid) {
+        bool rootChecker = await androidRootChecker();
+        bool devModeChecker = await developerMode();
+        if (rootChecker) {
+          return dartz.Right('Device anda tidak bisa digunakan karena ROOT');
+        } else if (devModeChecker) {
+          return dartz.Right('Matikan opsi pengembang terlebih dahulu');
+        } else {
+          return dartz.Left(true);
+        }
+      } else {
+        bool isJailbreak = await iosJailbreak();
+        if (isJailbreak) {
+          return dartz.Right('Device anda tidak bisa digunakan karena JAILBREAK');
+        } else {
+          return dartz.Left(true);
+        }
+      }
+    }
+
+    Future<bool> isMockLocationChecker() async {
+      return await isMockLocation();
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text("Hasil Foto")),
@@ -200,35 +217,34 @@ class _ResultPageState extends State<ResultPage> {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(24),
                                       child: Padding(
-                                          padding: const EdgeInsets.all(12),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.check_circle_rounded,
-                                                color: Colors.green,
-                                                size: 36,
-                                              ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text("Absen berhasil")
-                                            ],
-                                          ),
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle_rounded,
+                                              color: Colors.green,
+                                              size: 36,
+                                            ),
+                                            const SizedBox(
+                                              height: 8,
+                                            ),
+                                            Text("Absen berhasil")
+                                          ],
                                         ),
+                                      ),
                                     ),
                                   );
                                 },
-                              ).then(
-                                (value) {
-                                  context.read<GetListPresenceCubit>().getData();
-                                  Navigator.pushReplacement(
+                              ).then((value) {
+                                if (!context.mounted) return;
+                                context.read<GetListPresenceCubit>().getData();
+                                Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MainPage(),
                                     ));
-                                } 
-                              );
+                              });
                             } else if (state is PresenceFailed) {
                               failedMessage(context, message: state.message);
                             }
@@ -240,15 +256,35 @@ class _ResultPageState extends State<ResultPage> {
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: ElevatedButtonCustom(
-                                  onTap: () {
-                                    context.read<PresenceCubit>().presence(
-                                        presenceStatement:
-                                            DateTime.now().isAfter(tenAM)
-                                                ? "checkout"
-                                                : "checkin",
-                                        status: currentOption,
-                                        checkInTime: DateTime.now().toString(),
-                                        checkOutTime: DateTime.now().toString());
+                                  onTap: () async {
+                                    final result = await deviceCheck();
+                                    result.fold(
+                                      (l) async {
+                                        final isMock = await isMockLocationChecker();
+                                        if (isMock) {
+                                          if (!context.mounted) return;
+                                          failedMessage(context,
+                                              message:
+                                                  "Anda menggunakan lokasi palsu !");
+                                        } else {
+                                          if (!context.mounted) return;
+                                          context
+                                              .read<PresenceCubit>()
+                                              .presence(
+                                                  presenceStatement:
+                                                      DateTime.now()
+                                                              .isAfter(tenAM)
+                                                          ? "checkout"
+                                                          : "checkin",
+                                                  status: currentOption,
+                                                  checkInTime:
+                                                      DateTime.now().toString(),
+                                                  checkOutTime: DateTime.now()
+                                                      .toString());
+                                        }
+                                      },
+                                      (r) => failedMessage(context, message: r),
+                                    );
                                   },
                                   text: "Absen Sekarang"),
                             );

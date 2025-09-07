@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.6"
+  dartz:
+    dependency: "direct main"
+    description:
+      name: dartz
+      sha256: e6acf34ad2e31b1eb00948692468c30ab48ac8250e0f0df661e29f12dd252168
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.1"
   equatable:
     dependency: "direct main"
     description:
@@ -672,6 +680,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
+  root_checker_plus:
+    dependency: "direct main"
+    description:
+      name: root_checker_plus
+      sha256: beb9064fc7cc9ef3a0046a4a1a9503c94a3fa0d4a7ba4ce7b2da8c8850054435
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -813,6 +829,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.0"
+  trust_location:
+    dependency: "direct main"
+    description:
+      name: trust_location
+      sha256: "2457f4bcd9ef8423fd12d8ae1701040ecef37a488e4a46bfa50bad26d8cf7d80"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.13"
   typed_data:
     dependency: transitive
     description:
