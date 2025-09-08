@@ -1,6 +1,7 @@
 import 'package:afila_intern_presence/common/app_colors.dart';
 import 'package:afila_intern_presence/cubit/auth_cubit.dart';
 import 'package:afila_intern_presence/intern/cubit/get_current_user_cubit.dart';
+import 'package:afila_intern_presence/intern/pages/location_info_page.dart';
 import 'package:afila_intern_presence/pages/login_page.dart';
 import 'package:afila_intern_presence/widgets/elevated_button_custom.dart';
 import 'package:flutter/material.dart';
@@ -82,35 +83,37 @@ class AccountPage extends StatelessWidget {
             const SizedBox(
               height: 12,
             ),
-            InkWell(
-              onTap: () {},
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.device_unknown_rounded,
-                        size: 36,
-                        color: blueColor,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        "Informasi device anda",
-                        style: TextStyle(fontSize: 14),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // InkWell(
+            //   onTap: () {},
+            //   child: Card(
+            //     child: Padding(
+            //       padding: const EdgeInsets.all(8.0),
+            //       child: Row(
+            //         children: [
+            //           Icon(
+            //             Icons.device_unknown_rounded,
+            //             size: 36,
+            //             color: blueColor,
+            //           ),
+            //           const SizedBox(
+            //             width: 12,
+            //           ),
+            //           Text(
+            //             "Informasi device anda",
+            //             style: TextStyle(fontSize: 14),
+            //           )
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(
               height: 12,
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LocationInfoPage(),));
+              },
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

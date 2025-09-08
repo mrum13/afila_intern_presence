@@ -26,6 +26,7 @@ dependencies:
   intl: ^0.20.2
   location: ^8.0.1
   one_clock: ^2.0.2
+  permission_handler: ^12.0.1
   root_checker_plus: ^1.0.0
   shared_preferences: ^2.5.3
   tflite_flutter: ^0.11.0

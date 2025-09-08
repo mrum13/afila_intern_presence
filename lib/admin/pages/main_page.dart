@@ -104,19 +104,19 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Text('Absen'),
-                    SizedBox(width: 20),
-                    FloatingActionButton.small(
-                      heroTag: null,
-                      onPressed: () {},
-                      backgroundColor: blueColor,
-                      foregroundColor: whiteColor,
-                      child: Icon(Icons.pin_drop_rounded),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Text('Absen'),
+                //     SizedBox(width: 20),
+                //     FloatingActionButton.small(
+                //       heroTag: null,
+                //       onPressed: () {},
+                //       backgroundColor: blueColor,
+                //       foregroundColor: whiteColor,
+                //       child: Icon(Icons.pin_drop_rounded),
+                //     ),
+                //   ],
+                // ),
               ],
             )
 

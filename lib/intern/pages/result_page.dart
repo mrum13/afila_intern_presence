@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 
 class ResultPage extends StatefulWidget {
@@ -37,6 +38,7 @@ class _ResultPageState extends State<ResultPage> {
   bool isSimillar = false;
   String currentOption = options[0];
   bool isLoading = true;
+  String titleSet = "-";
 
   Future<void> _verifyFace(File pickedFile) async {
     var savedEmbedding = await StorageService.getFaces();
@@ -119,16 +121,90 @@ class _ResultPageState extends State<ResultPage> {
     var currentLocation = await Geolocator.getCurrentPosition();
 
     var data = await getDistance(
-      latOffice: double.parse(decodedData['lat']), 
-      longOffice: double.parse(decodedData['long']), 
-      latCurrent: currentLocation.latitude,
-      longCurrent: currentLocation.longitude
-    );
-    
-    if (data <= 6) {
+        latOffice: double.parse(decodedData['lat']),
+        longOffice: double.parse(decodedData['long']),
+        latCurrent: currentLocation.latitude,
+        longCurrent: currentLocation.longitude);
+
+    if (data <= 20) {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<void> title() async {
+    var data = context.read<GetListPresenceCubit>().state;
+
+    if (data is GetListPresenceSuccess) {
+      var dataMap = data.data
+          .map(
+            (e) => e.checkIn,
+          )
+          .toList();
+
+      var dataAll = data.data
+          .map(
+            (e) => e,
+          )
+          .toList();
+
+      DateTime today = DateTime.now();
+
+      bool hasToday = dataMap.any((p) =>
+          p.year == today.year && p.month == today.month && p.day == today.day);
+
+      hasToday ? titleSet = "Absen Pulang" : titleSet = "Absen Datang";
+
+      // cari data hari ini
+      var todayPresences = dataAll
+          .where((p) =>
+              p.checkIn.year == today.year &&
+              p.checkIn.month == today.month &&
+              p.checkIn.day == today.day)
+          .toList();
+
+      // cek apakah ada checkout
+      bool hasCheckout = todayPresences.any((p) => p.statement == "checkout");
+      if (hasCheckout) {
+        if (!context.mounted) return;
+
+        Future.delayed(Duration(seconds: 2)).then(
+          (value) => showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.close,
+                          color: Colors.red,
+                          size: 36,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text("Anda sudah absen hari ini !")
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ).then((value) {
+            if (!mounted) return;
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainPage(),
+                ));
+          }),
+        );
+      }
     }
   }
 
@@ -136,6 +212,7 @@ class _ResultPageState extends State<ResultPage> {
   void initState() {
     super.initState();
     isInsideArea();
+    title();
     faceRecognition.loadModel().then((value) => _verifyFace(widget.imageFile));
   }
 
@@ -158,7 +235,8 @@ class _ResultPageState extends State<ResultPage> {
       } else {
         bool isJailbreak = await iosJailbreak();
         if (isJailbreak) {
-          return dartz.Right('Device anda tidak bisa digunakan karena JAILBREAK');
+          return dartz.Right(
+              'Device anda tidak bisa digunakan karena JAILBREAK');
         } else {
           return dartz.Left(true);
         }
@@ -169,10 +247,8 @@ class _ResultPageState extends State<ResultPage> {
       return await isMockLocation();
     }
 
-
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Hasil Foto")),
+      appBar: AppBar(title: Text(titleSet)),
       body: Center(
           child: isLoading
               ? CircularProgressIndicator()
@@ -188,46 +264,54 @@ class _ResultPageState extends State<ResultPage> {
                           width: 300,
                           fit: BoxFit.cover,
                         )),
-                        const SizedBox(
-                          height: 24,
-                        ),
-                        ListTile(
-                          title: const Text("Hadir"),
-                          leading: Radio(
-                            value: options[0],
-                            groupValue: currentOption,
-                            activeColor: blueColor,
-                            onChanged: (value) {
-                              setState(() {
-                                currentOption = value.toString();
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: const Text("Izin"),
-                          leading: Radio(
-                            value: options[1],
-                            groupValue: currentOption,
-                            activeColor: blueColor,
-                            onChanged: (value) {
-                              setState(() {
-                                currentOption = value.toString();
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          title: const Text("Sakit"),
-                          leading: Radio(
-                            value: options[2],
-                            groupValue: currentOption,
-                            activeColor: blueColor,
-                            onChanged: (value) {
-                              setState(() {
-                                currentOption = value.toString();
-                              });
-                            },
+                        Visibility(
+                          visible: titleSet == 'Absen Datang' ? true : false,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              ListTile(
+                                title: const Text("Hadir"),
+                                leading: Radio(
+                                  value: options[0],
+                                  groupValue: currentOption,
+                                  activeColor: blueColor,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      currentOption = value.toString();
+                                    });
+                                  },
+                                ),
+                              ),
+                              ListTile(
+                                title: const Text("Izin"),
+                                leading: Radio(
+                                  value: options[1],
+                                  groupValue: currentOption,
+                                  activeColor: blueColor,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      currentOption = value.toString();
+                                    });
+                                  },
+                                ),
+                              ),
+                              ListTile(
+                                title: const Text("Sakit"),
+                                leading: Radio(
+                                  value: options[2],
+                                  groupValue: currentOption,
+                                  activeColor: blueColor,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      currentOption = value.toString();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(
@@ -276,46 +360,51 @@ class _ResultPageState extends State<ResultPage> {
                             }
                           },
                           builder: (context, state) {
-                            if (state is PresenceLoading || state is DeviceChecking) {
+                            if (state is PresenceLoading ||
+                                state is DeviceChecking) {
                               return const CircularProgressCustom();
                             }
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: ElevatedButtonCustom(
                                   onTap: () async {
-                                    context.read<PresenceCubit>().deviceChecking();
+                                    context
+                                        .read<PresenceCubit>()
+                                        .deviceChecking();
                                     final result = await deviceCheck();
                                     result.fold(
                                       (l) async {
-                                        final isMock = await isMockLocationChecker();
+                                        final isMock =
+                                            await isMockLocationChecker();
                                         if (isMock) {
                                           if (!context.mounted) return;
                                           failedMessage(context,
                                               message:
                                                   "Anda menggunakan lokasi palsu !");
                                         } else {
-                                          
-                                          var isInside  = await isInsideArea();
-                                          if (currentOption=='Hadir' && !isInside) {
+                                          var isInside = await isInsideArea();
+                                          if (currentOption == 'Hadir' &&
+                                              !isInside) {
                                             if (!context.mounted) return;
-                                            failedMessage(context, message: "Anda berada diluar area kerja !");
+                                            failedMessage(context,
+                                                message:
+                                                    "Anda berada diluar area kerja !");
                                           } else {
                                             if (!context.mounted) return;
                                             context
-                                              .read<PresenceCubit>()
-                                              .presence(
-                                                  presenceStatement:
-                                                      DateTime.now()
-                                                              .isAfter(tenAM)
-                                                          ? "checkout"
-                                                          : "checkin",
-                                                  status: currentOption,
-                                                  checkInTime:
-                                                      DateTime.now().toString(),
-                                                  checkOutTime: DateTime.now()
-                                                      .toString());
+                                                .read<PresenceCubit>()
+                                                .presence(
+                                                    presenceStatement:
+                                                        DateTime.now()
+                                                                .isAfter(tenAM)
+                                                            ? "checkout"
+                                                            : "checkin",
+                                                    status: currentOption,
+                                                    checkInTime: DateTime.now()
+                                                        .toString(),
+                                                    checkOutTime: DateTime.now()
+                                                        .toString());
                                           }
-                                          
                                         }
                                       },
                                       (r) => failedMessage(context, message: r),

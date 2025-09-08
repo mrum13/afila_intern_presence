@@ -83,13 +83,13 @@ class HomePage extends StatelessWidget {
                     "Intern",
                     style: TextStyle(fontSize: 24),
                   ),
-                  InkWell(
-                    onTap: () => context.read<GetInternDataCubit>().getData(),
-                    child: Text(
-                      "Lihat semua",
-                      style: TextStyle(color: blueColor),
-                    ),
-                  )
+                  // InkWell(
+                  //   onTap: () => context.read<GetInternDataCubit>().getData(),
+                  //   child: Text(
+                  //     "Lihat semua",
+                  //     style: TextStyle(color: blueColor),
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -199,13 +199,13 @@ class HomePage extends StatelessWidget {
                     "Absen Hari ini",
                     style: TextStyle(fontSize: 24),
                   ),
-                  InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Lihat semua",
-                      style: TextStyle(color: blueColor),
-                    ),
-                  )
+                  // InkWell(
+                  //   onTap: () {},
+                  //   child: Text(
+                  //     "Lihat semua",
+                  //     style: TextStyle(color: blueColor),
+                  //   ),
+                  // )
                 ],
               ),
             ),

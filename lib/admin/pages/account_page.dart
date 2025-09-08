@@ -79,7 +79,7 @@ class AccountPage extends StatelessWidget {
                     onTap: () {
                       Navigator.pushReplacementNamed(context, '/');
                     },
-                    text: "Logout"),
+                    text: "Keluar"),
               ],
             ),
           ),

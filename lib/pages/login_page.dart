@@ -102,7 +102,7 @@ class LoginPage extends StatelessWidget {
                               password: passController.text);
                         }
                       },
-                      text: "Login");
+                      text: "Masuk");
                 },
               )
             ],
