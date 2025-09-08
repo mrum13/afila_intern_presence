@@ -1,6 +1,7 @@
 import 'package:afila_intern_presence/admin/cubit/create_employee_cubit.dart';
 import 'package:afila_intern_presence/admin/cubit/create_user_cubit.dart';
 import 'package:afila_intern_presence/admin/cubit/get_intern_data_cubit.dart';
+import 'package:afila_intern_presence/admin/cubit/office_data_cubit.dart';
 import 'package:afila_intern_presence/admin/pages/create_user_page.dart';
 import 'package:afila_intern_presence/admin/pages/main_page.dart'
     as adminmainpage;
@@ -71,6 +72,10 @@ class MainApp extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               PresenceCubit(FirebaseFirestoreService(firebaseFirestore)),
+        ),
+        BlocProvider(
+          create: (context) =>
+              OfficeDataCubit(FirebaseFirestoreService(firebaseFirestore))
         ),
       ],
       child: MaterialApp(

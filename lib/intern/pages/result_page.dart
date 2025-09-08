@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:afila_intern_presence/common/app_colors.dart';
@@ -13,10 +14,13 @@ import 'package:afila_intern_presence/mlkit_services/helper/convert_face.dart';
 import 'package:afila_intern_presence/common/storage_service.dart';
 import 'package:afila_intern_presence/widgets/circular_progress_custom.dart';
 import 'package:afila_intern_presence/widgets/elevated_button_custom.dart';
+import 'package:d_method/d_method.dart';
 import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:location/location.dart';
 
 class ResultPage extends StatefulWidget {
   final File imageFile;
@@ -109,9 +113,29 @@ class _ResultPageState extends State<ResultPage> {
     });
   }
 
+  Future<bool> isInsideArea() async {
+    var officeData = await StorageService.getOfficeLatLong();
+    var decodedData = jsonDecode(officeData);
+    var currentLocation = await Geolocator.getCurrentPosition();
+
+    var data = await getDistance(
+      latOffice: double.parse(decodedData['lat']), 
+      longOffice: double.parse(decodedData['long']), 
+      latCurrent: currentLocation.latitude,
+      longCurrent: currentLocation.longitude
+    );
+    
+    if (data <= 6) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    isInsideArea();
     faceRecognition.loadModel().then((value) => _verifyFace(widget.imageFile));
   }
 
@@ -144,6 +168,8 @@ class _ResultPageState extends State<ResultPage> {
     Future<bool> isMockLocationChecker() async {
       return await isMockLocation();
     }
+
+
 
     return Scaffold(
       appBar: AppBar(title: const Text("Hasil Foto")),
@@ -250,13 +276,14 @@ class _ResultPageState extends State<ResultPage> {
                             }
                           },
                           builder: (context, state) {
-                            if (state is PresenceLoading) {
+                            if (state is PresenceLoading || state is DeviceChecking) {
                               return const CircularProgressCustom();
                             }
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: ElevatedButtonCustom(
                                   onTap: () async {
+                                    context.read<PresenceCubit>().deviceChecking();
                                     final result = await deviceCheck();
                                     result.fold(
                                       (l) async {
@@ -267,8 +294,14 @@ class _ResultPageState extends State<ResultPage> {
                                               message:
                                                   "Anda menggunakan lokasi palsu !");
                                         } else {
-                                          if (!context.mounted) return;
-                                          context
+                                          
+                                          var isInside  = await isInsideArea();
+                                          if (currentOption=='Hadir' && !isInside) {
+                                            if (!context.mounted) return;
+                                            failedMessage(context, message: "Anda berada diluar area kerja !");
+                                          } else {
+                                            if (!context.mounted) return;
+                                            context
                                               .read<PresenceCubit>()
                                               .presence(
                                                   presenceStatement:
@@ -281,6 +314,8 @@ class _ResultPageState extends State<ResultPage> {
                                                       DateTime.now().toString(),
                                                   checkOutTime: DateTime.now()
                                                       .toString());
+                                          }
+                                          
                                         }
                                       },
                                       (r) => failedMessage(context, message: r),

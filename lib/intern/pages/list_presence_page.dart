@@ -65,7 +65,7 @@ class _ListPresencePageState extends State<ListPresencePage> {
                                     children: [
                                       Text(
                                         DateFormat.yMMMEd()
-                                            .format(DateTime.now()),
+                                            .format(state.data[index].checkIn),
                                         style: TextStyle(color: blueColor),
                                       ),
                                       Text(

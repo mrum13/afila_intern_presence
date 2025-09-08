@@ -19,15 +19,16 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_expandable_fab: ^2.5.2
+  geolocator: ^13.0.4
   google_mlkit_face_detection: ^0.13.1
   image: ^4.5.4
   image_picker: ^1.2.0
   intl: ^0.20.2
+  location: ^8.0.1
   one_clock: ^2.0.2
   root_checker_plus: ^1.0.0
   shared_preferences: ^2.5.3
   tflite_flutter: ^0.11.0
-  trust_location: ^2.0.13
 
 dev_dependencies:
   flutter_lints: ^5.0.0

@@ -9,6 +9,7 @@ sealed class PresenceState extends Equatable {
 
 final class PresenceInitial extends PresenceState {}
 final class PresenceLoading extends PresenceState {}
+final class DeviceChecking extends PresenceState {}
 
 final class PresenceSuccess extends PresenceState {
   final bool status;

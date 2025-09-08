@@ -9,11 +9,11 @@ class GetListPresenceCubit extends Cubit<GetListPresenceState> {
  final  FirebaseFirestoreService _service;
   GetListPresenceCubit(this._service) : super(GetListPresenceInitial());
 
-    void getData() async {
+    void getData({bool isAdmin = false}) async {
     try {
       emit(GetListPresenceLoading());
 
-      var result = await _service.getHistoryPresence();
+      var result = await _service.getHistoryPresence(isAdmin: isAdmin);
 
       emit(GetListPresenceSuccess(result));
     } catch (e) {

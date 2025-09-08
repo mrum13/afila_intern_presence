@@ -24,4 +24,9 @@ class PresenceCubit extends Cubit<PresenceState> {
       emit(PresenceFailed(e.toString()));
     }
   }
+
+  void deviceChecking(){
+    emit(DeviceChecking());
+    Future.delayed(Duration(seconds: 2)).then((value) => emit(PresenceInitial()),);
+  }
 }

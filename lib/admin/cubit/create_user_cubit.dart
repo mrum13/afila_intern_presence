@@ -13,7 +13,7 @@ class CreateUserCubit extends Cubit<CreateUserState> {
     try {
       emit(CreateUserLoading());
 
-      await _service.createUser(email, password);
+      await _service.createUser(email.replaceAll(" ", ""), password);
 
       emit(CreateUserSuccess(true));
     } catch (e) {

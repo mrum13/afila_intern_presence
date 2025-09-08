@@ -1,5 +1,6 @@
 import 'package:afila_intern_presence/intern/models/user_model.dart';
 import 'package:afila_intern_presence/services/firebase_firestore_service.dart';
+import 'package:d_method/d_method.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -11,6 +12,7 @@ class GetCurrentUserCubit extends Cubit<GetCurrentUserState> {
 
   void getData({required String docId}) async {
     try {
+      DMethod.log(docId, prefix: "docId");
       emit(GetCurrentUserLoading());
 
       var result = await _service.getCurrentUser(docId);

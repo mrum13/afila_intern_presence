@@ -1,4 +1,5 @@
 import 'package:afila_intern_presence/admin/cubit/get_intern_data_cubit.dart';
+import 'package:afila_intern_presence/admin/cubit/office_data_cubit.dart';
 import 'package:afila_intern_presence/common/message_widget.dart';
 import 'package:afila_intern_presence/cubit/auth_cubit.dart';
 import 'package:afila_intern_presence/cubit/navbar_cubit.dart';
@@ -15,8 +16,8 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController = TextEditingController(text: "rum@intern.com");
-    TextEditingController passController = TextEditingController(text: "intern1234");
+    TextEditingController emailController = TextEditingController(text: "afila@admin.com");
+    TextEditingController passController = TextEditingController(text: "admin1234");
 
     return Scaffold(
       body: SafeArea(
@@ -70,11 +71,14 @@ class LoginPage extends StatelessWidget {
 
                     context.read<NavbarCubit>().setIndexPage(index: 0);
                     if (role.contains("@admin")) {
+                      context.read<GetCurrentUserCubit>().getData(docId: role);
                       context.read<GetInternDataCubit>().getData();
+                      context.read<GetListPresenceCubit>().getData(isAdmin: true);
                       Navigator.pushNamed(context, '/main-page-admin');
                     } else if (role.contains("@intern")) {
                       context.read<GetCurrentUserCubit>().getData(docId: role);
                       context.read<GetListPresenceCubit>().getData();
+                      context.read<OfficeDataCubit>().getData();
                       Navigator.pushNamed(context, '/main-page-intern');
                     } else {}
                   }

@@ -1,7 +1,5 @@
 import 'package:afila_intern_presence/admin/models/user_model.dart';
-import 'package:afila_intern_presence/services/firebase_auth_service.dart';
 import 'package:afila_intern_presence/services/firebase_firestore_service.dart';
-import 'package:d_method/d_method.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -16,8 +14,6 @@ class GetInternDataCubit extends Cubit<GetInternDataState> {
       emit(GetInternDataLoading());
 
       var result = await _service.getDataEmployee();
-
-      DMethod.log(result.toString(), prefix: "Get Data Intern");
 
       emit(GetInternDataSuccess(result));
     } catch (e) {

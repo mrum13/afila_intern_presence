@@ -12,7 +12,7 @@ class CreateEmployeeCubit extends Cubit<CreateEmployeeState> {
     try {
       emit(CreateEmployeeLoading());
 
-      await _service.createData(name: name, email: email, faceChar: embeddData);
+      await _service.createData(name: name, email: email.replaceAll(" ", "").toLowerCase(), faceChar: embeddData);
 
       emit(CreateEmployeeSuccess(true));
     } catch (e) {
